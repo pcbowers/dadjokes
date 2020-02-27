@@ -1,60 +1,50 @@
 <template>
   <div class="page-container">
     <SearchJokes @search-text="searchText" />
+    <div>{{ totalJokes }} Total Jokes</div>
     <!-- eslint-disable -->
     <Joke v-for="joke in jokes" :id="joke.id" :key="joke.id" :joke="joke.joke" />
+    <button v-if="seeMore" class="button is-block is-primary" @click="addPage">See More...</button>
     <!-- eslint-enable -->
   </div>
 </template>
 
 <script>
-import axios from 'axios';
 import Joke from '../../components/Joke';
 import SearchJokes from '../../components/SearchJokes';
+import search from '../../mixins/search';
 
 export default {
   components: {
     Joke,
     SearchJokes
   },
+  mixins: [search],
   data() {
     return {
-      jokes: []
+      jokes: [],
+      term: '',
+      seeMore: true
     };
   },
   async created() {
-    const config = {
-      headers: {
-        Accept: 'application/json'
-      }
-    };
-
-    try {
-      const res = await axios.get('https://icanhazdadjoke.com/search', config);
-
-      this.jokes = res.data.results;
-    } catch (error) {
-      // console.log(error);
-    }
+    this.jokes = await this.search();
+    this.hideSeeMore();
   },
   methods: {
     async searchText(text) {
-      const config = {
-        headers: {
-          Accept: 'application/json'
-        }
-      };
-
-      try {
-        const res = await axios.get(
-          `https://icanhazdadjoke.com/search?term=${text}`,
-          config
-        );
-
-        this.jokes = res.data.results;
-      } catch (error) {
-        // console.log(error);
-      }
+      this.term = text;
+      this.jokes = await this.search({ term: this.term });
+      this.hideSeeMore();
+    },
+    async addPage() {
+      const next = await this.search({ term: this.term, page: this.nextPage });
+      this.jokes.push(...next);
+      this.hideSeeMore();
+    },
+    hideSeeMore() {
+      this.seeMore =
+        this.jokes.length !== this.totalJokes && this.getNextPage();
     }
   },
   head() {

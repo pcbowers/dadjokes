@@ -6,31 +6,17 @@
 </template>
 
 <script>
-import axios from 'axios';
+import search from '../../../mixins/search';
 
 export default {
+  mixins: [search],
   data() {
     return {
-      joke: {}
+      joke: 'Loading...'
     };
   },
   async created() {
-    const config = {
-      headers: {
-        Accept: 'application/json'
-      }
-    };
-
-    try {
-      const res = await axios.get(
-        `https://icanhazdadjoke.com/j/${this.$route.params.id}`,
-        config
-      );
-
-      this.joke = res.data.joke;
-    } catch (error) {
-      // console.log(error);
-    }
+    this.joke = await this.search({ id: this.$route.params.id });
   },
   head() {
     return {
