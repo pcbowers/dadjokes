@@ -18,6 +18,7 @@ export default {
 body,
 html {
   background: rgb(224, 248, 239);
+  overflow: hidden;
 }
 
 .container {

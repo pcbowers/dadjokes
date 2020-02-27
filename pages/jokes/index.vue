@@ -1,10 +1,21 @@
 <template>
   <div class="page-container">
     <SearchJokes @search-text="searchText" />
-    <div>{{ totalJokes }} Total Jokes</div>
+    <div>
+      <b>{{ this.jokes.length }} of {{ totalJokes }}</b> Jokes
+    </div>
     <!-- eslint-disable -->
-    <Joke v-for="joke in jokes" :id="joke.id" :key="joke.id" :joke="joke.joke" />
-    <button v-if="seeMore" class="button is-block is-primary" @click="addPage">See More...</button>
+    <div class="joke-container" @scroll="onScroll">
+      <Joke v-for="joke in jokes" :id="joke.id" :key="joke.id" :joke="joke.joke" />
+      <img
+        v-if="seeMore"
+        src="../../static/load.gif"
+        id="loading"
+        alt="Loading"
+        width="300"
+        height="300"
+      />
+    </div>
     <!-- eslint-enable -->
   </div>
 </template>
@@ -42,6 +53,11 @@ export default {
       this.jokes.push(...next);
       this.hideSeeMore();
     },
+    onScroll({ target: { scrollTop, clientHeight, scrollHeight } }) {
+      if (scrollTop + clientHeight >= scrollHeight) {
+        if (this.seeMore) this.addPage();
+      }
+    },
     hideSeeMore() {
       this.seeMore =
         this.jokes.length !== this.totalJokes && this.getNextPage();
@@ -62,4 +78,19 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.page-container {
+  height: 72vh;
+}
+
+.joke-container {
+  overflow-y: scroll;
+  height: 56vh;
+}
+
+#loading {
+  width: 20px;
+  display: block;
+  margin: auto;
+}
+</style>
