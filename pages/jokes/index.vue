@@ -2,7 +2,7 @@
   <div class="page-container">
     <SearchJokes @search-text="searchText" />
     <div>
-      <b>{{ this.jokes.length }} of {{ totalJokes }}</b> Jokes
+      <b>{{ jokes.length }} of {{ totalJokes }}</b> Jokes
     </div>
     <!-- eslint-disable -->
     <div class="joke-container" @scroll="onScroll">
@@ -44,6 +44,7 @@ export default {
   },
   methods: {
     async searchText(text) {
+      this.seeMore = true;
       this.term = text;
       this.jokes = await this.search({ term: this.term });
       this.hideSeeMore();
